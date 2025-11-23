@@ -6,12 +6,13 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { placeId, gameInstanceId, animalData, timestamp, source } = req.body;
+    const { placeId, gameInstanceId, animalData } = req.body;
 
-    // Lógica para procesar los datos, por ejemplo, guardarlos en una base de datos
-    console.log('Received data:', { placeId, gameInstanceId, animalData, timestamp, source });
+    console.log('Received data:', { placeId, gameInstanceId, animalData });
 
-    // Responder con éxito
+    // Procesa los datos aquí según sea necesario, por ejemplo, guardándolos en una base de datos
+
+    // Responde con éxito
     res.status(200).json({ message: 'Data received successfully!' });
   } catch (error) {
     console.error('Error:', error);
