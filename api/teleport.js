@@ -1,30 +1,20 @@
-const express = require('express');
-const fetch = require('node-fetch');
-const app = express();
+// api/teleport.js
 
-// Middleware para parsear JSON
-app.use(express.json());
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ message: 'Method Not Allowed' });
+  }
 
-// Endpoint POST para recibir datos
-app.post('/api/teleport', (req, res) => {
-    const { placeId, gameInstanceId, animalData } = req.body;
+  try {
+    const { placeId, gameInstanceId, animalData, timestamp, source } = req.body;
 
-    if (!placeId || !gameInstanceId || !animalData) {
-        return res.status(400).json({ error: "Missing required data" });
-    }
-
-    // Lógica para manejar los datos (esto es solo un ejemplo)
-    console.log("Received data:", { placeId, gameInstanceId, animalData });
+    // Lógica para procesar los datos, por ejemplo, guardarlos en una base de datos
+    console.log('Received data:', { placeId, gameInstanceId, animalData, timestamp, source });
 
     // Responder con éxito
-    return res.json({
-        success: true,
-        message: "Data received successfully",
-        data: { placeId, gameInstanceId, animalData },
-    });
-});
-
-// Exportar la función handler para que Vercel la maneje
-module.exports = (req, res) => {
-    app(req, res); // Usamos app(req, res) para manejar la solicitud
-};
+    res.status(200).json({ message: 'Data received successfully!' });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+}
