@@ -2,14 +2,16 @@
   "name": "my-api",
   "version": "1.0.0",
   "description": "My API for teleporting animals",
-  "main": "index.js",
+  "main": "api/teleport.js",  // Asegúrate de que el archivo principal esté en la carpeta `api`
   "scripts": {
-    "start": "node index.js"
+    "start": "node api/teleport.js"  // Cambia esto para que apunte a tu archivo de API
   },
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "node-fetch": "^2.6.1"  // Si estás usando node-fetch en tu código
   },
-  "devDependencies": {
-    "vercel": "^21.1.0"
+  "devDependencies": {},
+  "engines": {
+    "node": "16.x"
   }
 }
