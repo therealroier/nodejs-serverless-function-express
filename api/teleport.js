@@ -1,51 +1,21 @@
-// Datos de ejemplo con más detalles
-const animalData = {
-    value: 5200000,
-    generation: "$5.2M/s",
-    rarity: "Secret",
-    displayName: "Los Tortus"
-};
+// api/teleport.js
 
-// Otros datos (como el placeId, gameInstanceId, etc.)
-const metadata = {
-    placeId: "109983668079237",
-    gameInstanceId: "761a6ab1-8aa0-4a1e-b466-b1dd9067aac8",
-    animalData: animalData,
-    expiresIn: "5739ms",
-    timestamp: 1763861163650
-};
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ message: 'Method Not Allowed' });
+  }
 
-// Función para obtener el tiempo actual en formato legible
-function obtenerHoraActual() {
-    const fecha = new Date();
-    return fecha.toISOString();  // Devuelve el timestamp en formato ISO
+  try {
+    const { placeId, gameInstanceId, animalData } = req.body;
+
+    console.log('Received data:', { placeId, gameInstanceId, animalData });
+
+    // Procesa los datos aquí según sea necesario, por ejemplo, guardándolos en una base de datos
+
+    // Responde con éxito
+    res.status(200).json({ message: 'Data received successfully!' });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
 }
-
-// Función para marcar los datos con un timestamp
-function marcarAnimal() {
-    const timestamp = obtenerHoraActual();
-    
-    // Imprimir los datos en formato JSON con timestamp
-    console.log(`[${timestamp}] { 
-        "placeId": "${metadata.placeId}",
-        "gameInstanceId": "${metadata.gameInstanceId}",
-        "animalData": {
-            "value": ${metadata.animalData.value},
-            "generation": "${metadata.animalData.generation}",
-            "rarity": "${metadata.animalData.rarity}",
-            "displayName": "${metadata.animalData.displayName}"
-        },
-        "expiresIn": "${metadata.expiresIn}",
-        "timestamp": ${metadata.timestamp}
-    }`);
-}
-
-// Exportar la función handler (si es para AWS Lambda o similar)
-exports.handler = async (event) => {
-    // Ejecutar la función cuando se invoque el handler
-    marcarAnimal();
-    return {
-        statusCode: 200,
-        body: JSON.stringify({ message: "Datos marcados correctamente" })
-    };
-};
