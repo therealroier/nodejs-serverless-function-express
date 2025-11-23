@@ -6,15 +6,22 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Extraer datos del cuerpo de la solicitud
     const { placeId, gameInstanceId, animalData, timestamp, source } = req.body;
 
-    // Lógica para procesar la solicitud
+    // Verificar que los datos necesarios estén presentes
+    if (!placeId || !gameInstanceId || !animalData || !timestamp || !source) {
+      return res.status(400).json({ message: 'Bad Request: Missing required data' });
+    }
+
+    // Lógica para procesar la solicitud (si es necesario)
     console.log('Received data:', { placeId, gameInstanceId, animalData, timestamp, source });
 
-    // Si todo va bien, responde con un éxito
-    res.status(200).json({ message: 'Data received successfully!' });
+    // Responder con éxito
+    return res.status(200).json({ message: 'Data received successfully!' });
+
   } catch (error) {
     console.error('Error:', error);
-    res.status(500).json({ message: 'Internal Server Error' });
+    return res.status(500).json({ message: 'Internal Server Error' });
   }
 }
