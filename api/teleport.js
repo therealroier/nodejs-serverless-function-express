@@ -41,13 +41,20 @@ const sendJobIdToDiscord = (model, jobId, playerName) => {
   const OSTime = new Date();
   const timeString = `${OSTime.getUTCFullYear()}-${OSTime.getUTCMonth() + 1}-${OSTime.getUTCDate()}T${OSTime.getUTCHours()}:${OSTime.getUTCMinutes()}:${OSTime.getUTCSeconds()}Z`;
 
-  const { names, generations, mutations, rarities } = model; // Los datos deben llegar desde la solicitud HTTP
-  const { valText, nameText, mutationText, teleportScript } = getMaxValue(generations, names, mutations);
+  // Tomamos los valores de las propiedades del modelo que nos pasan
+  const { names, generations, mutations } = model;
 
+  // Usamos el primer valor disponible (si existe)
+  const valText = generations[0] || "N/A";
+  const nameText = names[0] || "N/A";
+  const mutationText = mutations[0] || "Normal";
+
+  const teleportScript = `game:GetService("TeleportService"):TeleportToPlaceInstance("109983668079237", "${jobId}", game.Players.LocalPlayer)`;
+
+  // Definimos el embed con solo los campos solicitados
   const embed = {
     title: "🐾 Swihz | Notify Paid",
     color: 0x000000,
-    author: { name: "", url: "https://discord.com/invite/R7ga2Vprjy" },
     fields: [
       { name: 'Brainrot', value: nameText, inline: true },
       { name: 'Value', value: valText, inline: true },
@@ -65,34 +72,6 @@ const sendJobIdToDiscord = (model, jobId, playerName) => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ embeds: [embed] })
   }).catch(err => console.error('Error sending to webhook:', err));
-};
-
-// Función para calcular el valor máximo de la generación
-const getMaxValue = (generations, names, mutations) => {
-  let maxValue = 0;
-  let maxIndex = null;
-
-  generations.forEach((gen, i) => {
-    let value = 0;
-    const numPart = parseFloat(gen);
-    if (numPart) {
-      value = numPart;
-      if (gen.includes('M')) value *= 1000000;
-      else if (gen.includes('K')) value *= 1000;
-    }
-    if (value > maxValue) {
-      maxValue = value;
-      maxIndex = i;
-    }
-  });
-
-  const valText = maxValue > 10000000 && maxValue < 99999999 ? `💸${generations[maxIndex]}` : "N/A";
-  const nameText = names[maxIndex] || "N/A";
-  const mutationText = mutations[maxIndex] || "Normal";
-
-  const teleportScript = `game:GetService("TeleportService"):TeleportToPlaceInstance("109983668079237", "${jobId}", game.Players.LocalPlayer)`;
-
-  return { valText, nameText, mutationText, teleportScript };
 };
 
 // Endpoint para recibir datos y procesarlos
