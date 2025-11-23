@@ -40,5 +40,12 @@ function marcarAnimal() {
     }`);
 }
 
-// Ejecutar la función
-marcarAnimal();
+// Exportar la función handler (si es para AWS Lambda o similar)
+exports.handler = async (event) => {
+    // Ejecutar la función cuando se invoque el handler
+    marcarAnimal();
+    return {
+        statusCode: 200,
+        body: JSON.stringify({ message: "Datos marcados correctamente" })
+    };
+};
