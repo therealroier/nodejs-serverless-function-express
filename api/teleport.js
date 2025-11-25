@@ -1,58 +1,59 @@
-const express = require('express');
-const axios = require('axios');
-const router = express.Router();
-
-// Webhook URL para Discord
-const WEBHOOK_URL = "https://discord.com/api/webhooks/1441973041868443798/imWXBKQltP9VFcDhXr_ema7gagVfFSPsTis6q8Vl_qQhlQEm7yBnSNWVJsckJGo1c8OF";
-
-// Función para enviar datos al Webhook de Discord
-const sendDiscordWebhook = (animalData) => {
-    const embed = {
-        embeds: [
-            {
-                title: "🐾 **Brainrot Notify | ZL Hub**",
-                color: 65280,
-                fields: [
-                    { name: "**Name**", value: animalData.displayName, inline: false },
-                    { name: "**Money per sec**", value: `💰 ${animalData.value} per second`, inline: true },
-                    { name: "**Generation**", value: `📊 ${animalData.generation}`, inline: true },
-                    { name: "**Rarity**", value: `🌟 ${animalData.rarity}`, inline: true },
-                    // Otros campos...
-                ],
-                timestamp: new Date().toISOString(),
-                footer: { text: "Made by ZL Hub • " + new Date().toLocaleString() },
-            },
-        ],
-        username: "ZL Hub Notifier",
-        avatar_url: "https://cdn.discordapp.com/attachments/1128833213672656988/1215321493282160730/standard_1.gif",
-    };
-
-    axios.post(WEBHOOK_URL, embed)
-        .then((response) => {
-            console.log('Webhook enviado correctamente a Discord');
-        })
-        .catch((error) => {
-            console.error('Error enviando webhook a Discord:', error);
-        });
-};
-
-// Ruta para manejar solicitudes POST de Roblox
-router.post('/', (req, res) => {
-    const { placeId, gameInstanceId, animalData, timestamp, source } = req.body;
-
-    // Verificar si los datos necesarios están presentes
-    if (!placeId || !gameInstanceId || !animalData) {
-        return res.status(400).json({ error: 'Faltan datos esenciales' });
+module.exports = async (req, res) => {
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Método no permitido, se requiere POST' });
     }
 
-    // Aquí puedes agregar lógica para procesar los datos antes de enviarlos a Discord
-    console.log('Datos recibidos:', req.body);
+    // Recibir los datos desde Roblox
+    const { placeId, gameInstanceId, animalData, timestamp, source } = req.body;
 
-    // Enviar los datos al Webhook de Discord
-    sendDiscordWebhook(animalData);
+    // Verificar si los datos son válidos
+    if (!placeId || !gameInstanceId || !animalData) {
+        return res.status(400).json({ error: 'Faltan datos esenciales en el cuerpo de la solicitud' });
+    }
 
-    // Responder con éxito
-    res.status(200).json({ message: 'Datos procesados correctamente' });
-});
+    // Desestructurar los datos del animal
+    const { displayName, value, generation, rarity } = animalData;
 
-module.exports = router;
+    // Formatear el valor del dinero por segundo
+    let moneyPerSecFormatted = '';
+    if (value >= 1000000000) {
+        moneyPerSecFormatted = `${(value / 1000000000).toFixed(1)}B/s`;
+    } else if (value >= 1000000) {
+        moneyPerSecFormatted = `${(value / 1000000).toFixed(1)}M/s`;
+    } else if (value >= 1000) {
+        moneyPerSecFormatted = `${(value / 1000).toFixed(1)}K/s`;
+    } else {
+        moneyPerSecFormatted = `${value}s`;
+    }
+
+    // Mostrar los datos en un formato HTML para la página
+    const htmlContent = `
+        <html>
+            <head>
+                <title>Información de Animal</title>
+            </head>
+            <body>
+                <h1>Detalles del Animal</h1>
+                <p><strong>Nombre:</strong> ${displayName}</p>
+                <p><strong>Money per second:</strong> ${moneyPerSecFormatted}</p>
+                <p><strong>Generación:</strong> ${generation}</p>
+                <p><strong>Rareza:</strong> ${rarity}</p>
+                <p><strong>Job ID:</strong> <code>${gameInstanceId}</code></p>
+                <p><strong>Place ID:</strong> <code>${placeId}</code></p>
+                <h3>Unirse al juego</h3>
+                <p><strong>Link de Unirse:</strong> 
+                    <a href="https://chillihub1.github.io/chillihub-joiner/?placeId=${placeId}&gameInstanceId=${gameInstanceId}" target="_blank">
+                        Haz clic para unirte
+                    </a>
+                </p>
+                <p><strong>Script de Teletransportación (PC):</strong></p>
+                <pre>
+game:GetService("TeleportService"):TeleportToPlaceInstance(${placeId}, "${gameInstanceId}", game.Players.LocalPlayer)
+                </pre>
+            </body>
+        </html>
+    `;
+
+    // Responder con el contenido HTML generado
+    res.status(200).send(htmlContent);
+};
