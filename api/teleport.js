@@ -1,20 +1,21 @@
 module.exports = async (req, res) => {
+    // Verificar si el método es POST
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Método no permitido, se requiere POST' });
     }
 
-    // Recibir los datos desde Roblox
+    // Obtener los datos de la solicitud
     const { placeId, gameInstanceId, animalData, timestamp, source } = req.body;
 
-    // Verificar si los datos son válidos
+    // Validar los datos
     if (!placeId || !gameInstanceId || !animalData) {
         return res.status(400).json({ error: 'Faltan datos esenciales en el cuerpo de la solicitud' });
     }
 
-    // Desestructurar los datos del animal
+    // Extraer los datos del animal
     const { displayName, value, generation, rarity } = animalData;
 
-    // Formatear el valor del dinero por segundo
+    // Formatear el valor de dinero por segundo
     let moneyPerSecFormatted = '';
     if (value >= 1000000000) {
         moneyPerSecFormatted = `${(value / 1000000000).toFixed(1)}B/s`;
@@ -26,12 +27,10 @@ module.exports = async (req, res) => {
         moneyPerSecFormatted = `${value}s`;
     }
 
-    // Mostrar los datos en un formato HTML para la página
+    // Mostrar los datos en formato HTML
     const htmlContent = `
         <html>
-            <head>
-                <title>Información de Animal</title>
-            </head>
+            <head><title>Detalles del Animal</title></head>
             <body>
                 <h1>Detalles del Animal</h1>
                 <p><strong>Nombre:</strong> ${displayName}</p>
@@ -54,6 +53,6 @@ game:GetService("TeleportService"):TeleportToPlaceInstance(${placeId}, "${gameIn
         </html>
     `;
 
-    // Responder con el contenido HTML generado
+    // Responder con el contenido HTML
     res.status(200).send(htmlContent);
 };
