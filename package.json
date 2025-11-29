@@ -1,16 +1,13 @@
 {
-  "name": "my-api",
+  "name": "robloi",
   "version": "1.0.0",
-  "description": "My API for teleporting animals",
+  "description": "API ",
+  "main": "api/teleport.js",
   "scripts": {
-    "start": "node api/teleport.js"
+    "dev": "vercel dev"
   },
   "dependencies": {
-    "express": "^4.17.1",
-    "node-fetch": "^2.6.1"
-  },
-  "devDependencies": {
-    "vercel": "^21.1.0"
+    "axios": "^1.6.0"
   },
   "engines": {
     "node": "22.x"
